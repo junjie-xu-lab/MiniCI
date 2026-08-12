@@ -1,0 +1,22 @@
+version: 1
+project:
+  name: python-example
+defaults:
+  timeout: 600
+  retry: {max_attempts: 1, delay_seconds: 0}
+stages:
+  - name: quality
+    parallel: true
+    steps:
+      - name: lint
+        commands:
+          - argv: [python, -m, ruff, check, .]
+      - name: test
+        retry: {max_attempts: 2, delay_seconds: 1}
+        commands:
+          - argv: [python, -m, pytest]
+  - name: build
+    steps:
+      - name: package
+        commands:
+          - argv: [python, -m, build]

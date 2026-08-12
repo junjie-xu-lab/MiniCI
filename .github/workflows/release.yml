@@ -1,0 +1,32 @@
+name: Release artifacts
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: minici-windows-x64
+            binary: dist/minici.exe
+          - os: ubuntu-latest
+            artifact: minici-linux-x64
+            binary: dist/minici
+          - os: macos-latest
+            artifact: minici-macos
+            binary: dist/minici
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,release]"
+      - run: python -m pytest
+      - run: pyinstaller --clean --noconfirm packaging/minici.spec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}
