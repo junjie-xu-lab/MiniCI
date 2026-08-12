@@ -4,7 +4,8 @@ from minici.runners.docker import DockerRunner
 from minici.runners.local import LocalRunner
 
 
-def test_git_outside_repository(tmp_path) -> None:
+def test_git_outside_repository(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))
     assert inspect_git(tmp_path).available is False
 
 
