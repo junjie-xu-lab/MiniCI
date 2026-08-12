@@ -3,7 +3,7 @@
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from threading import Event
 
@@ -48,7 +48,7 @@ class PipelineService:
 
     def _execute_locked(self, config: MiniCIConfig) -> PipelineResult:
         call_hook(self.plugins, "before_run", config.project.name)
-        started = datetime.now(UTC)
+        started = datetime.now(timezone.utc)
         run_id, run_uid, run_directory = self.repository.start_run(
             config.project.name, self.data_root / "runs"
         )
@@ -90,7 +90,7 @@ class PipelineService:
                 project=config.project.name,
                 status=final_status,
                 started_at=started,
-                ended_at=datetime.now(UTC),
+                ended_at=datetime.now(timezone.utc),
                 stages=stages,
                 run_id=run_id,
                 run_uid=run_uid,

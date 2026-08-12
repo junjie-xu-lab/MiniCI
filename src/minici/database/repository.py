@@ -2,7 +2,7 @@
 
 import json
 import sqlite3
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -90,7 +90,7 @@ class RunRepository:
             cursor = connection.execute(
                 "INSERT INTO runs(run_uid, project, status, started_at, run_directory) "
                 "VALUES (?, ?, 'RUNNING', ?, ?)",
-                (run_uid, project, datetime.now(UTC).isoformat(), str(run_directory)),
+                (run_uid, project, datetime.now(timezone.utc).isoformat(), str(run_directory)),
             )
             return int(cursor.lastrowid), run_uid, run_directory
 
@@ -161,7 +161,7 @@ class RunRepository:
         with self.connect() as connection:
             connection.execute(
                 "UPDATE runs SET status=?, ended_at=? WHERE id=? AND status='RUNNING'",
-                (status, datetime.now(UTC).isoformat(), run_id),
+                (status, datetime.now(timezone.utc).isoformat(), run_id),
             )
 
     def details(self, run_id: int) -> dict[str, object] | None:
